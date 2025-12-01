@@ -1,74 +1,69 @@
 import { Router } from "express";
-import { tasks, task } from "../data/tasks";
+import { taskService } from "../services/TaskService";
 
 export const tasksRouter = Router();
 
+// GET ALL
 tasksRouter.get("/", (req, res) => {
+  const tasks = taskService.getAll();
   return res.json(tasks);
 });
 
+// GET BY ID
 tasksRouter.get("/:id", (req, res) => {
   const id = Number(req.params.id);
-  const task = tasks.find((t) => t.id === id);
 
-  if (!task) {
-    return res.status(404).json({ error: "Tarefa não encontrada!" });
+  try {
+    const task = taskService.getById(id);
+    return res.json(task);
+  } catch (err) {
+    return res.status(404).json({ error: "Task not found" });
   }
-
-  return res.json(task);
 });
 
+// CREATE
 tasksRouter.post("/", (req, res) => {
   const { title, description } = req.body;
 
   if (!title) {
-    return res.status(400).json({ error: "Título é obrigatório" });
+    return res.status(400).json({ error: "Title is required" });
   }
 
-  const newTask: task = {
-    id: tasks.length + 1,
+  const task = taskService.create({
     title,
     description,
     isCompleted: false,
-  };
+  });
 
-  tasks.push(newTask);
-
-  return res.status(201).json(newTask);
+  return res.status(201).json(task);
 });
 
+// UPDATE
 tasksRouter.put("/:id", (req, res) => {
   const id = Number(req.params.id);
   const { title, description, isCompleted } = req.body;
 
-  const taskIndex = tasks.findIndex((t) => t.id === id);
+  try {
+    const updated = taskService.update(id, {
+      title,
+      description,
+      isCompleted,
+    });
 
-  if (taskIndex === -1) {
-    return res.status(404).json({ error: "Tarefa não encontrada!" });
+    return res.json(updated);
+  } catch (err) {
+    return res.status(404).json({ error: "Task not found" });
   }
-
-  const updatedTask = {
-    ...tasks[taskIndex],
-    title: title ?? tasks[taskIndex].title,
-    description: description ?? tasks[taskIndex].description,
-    isCompleted: isCompleted ?? tasks[taskIndex].isCompleted,
-  };
-
-  tasks[taskIndex] = updatedTask;
-
-  return res.json(updatedTask);
 });
 
+// DELETE
 tasksRouter.delete("/:id", (req, res) => {
   const id = Number(req.params.id);
 
-  const taskIndex = tasks.findIndex((t) => t.id === id);
-
-  if (taskIndex === -1) {
-    return res.status(404).json({ error: "Tarefa não encontrada!" });
+  try {
+    taskService.delete(id);
+    return res.status(204).send();
+  } catch (err) {
+    return res.status(404).json({ error: "Task not found" });
   }
-
-  tasks.splice(taskIndex, 1);
-
-  return res.status(204).send();
 });
