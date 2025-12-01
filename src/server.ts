@@ -1,12 +1,16 @@
-import express from 'express';
+import express from "express";
+import { tasksRouter } from "./routes/task.routes";
 
 const app = express();
-const PORT = 3000;
 
-app.get('/health', (req, res) => {
-  res.json({ status: 'ok' });
+app.use(express.json());
+
+app.use("/tasks", tasksRouter);
+
+app.get("/health", (req, res) => {
+  res.json({ status: "ok" });
 });
 
-app.listen(PORT, () => {
-  console.log(`Servidor rodando em http://localhost:${PORT}`);
+app.listen(3000, () => {
+  console.log("Servidor rodando em http://localhost:3000");
 });
