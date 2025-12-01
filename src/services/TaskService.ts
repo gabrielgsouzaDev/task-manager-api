@@ -10,12 +10,10 @@ export class TaskService {
     },
   ];
 
-  // Retorna todas
   getAll() {
     return this.tasks;
   }
 
-  // Retorna uma por ID
   getById(id: number) {
     const task = this.tasks.find((t) => t.id === id);
 
@@ -26,7 +24,6 @@ export class TaskService {
     return task;
   }
 
-  // Cria nova tarefa
   create(data: Omit<ITask, "id">) {
     const newTask: ITask = {
       id: this.tasks.length + 1,
@@ -37,7 +34,6 @@ export class TaskService {
     return newTask;
   }
 
-  // Atualiza tarefa
   update(id: number, data: Partial<Omit<ITask, "id">>) {
     const index = this.tasks.findIndex((t) => t.id === id);
 
@@ -55,7 +51,6 @@ export class TaskService {
     return updated;
   }
 
-  // Deleta tarefa
   delete(id: number) {
     const index = this.tasks.findIndex((t) => t.id === id);
 
@@ -67,5 +62,4 @@ export class TaskService {
   }
 }
 
-// Exporta instância única
 export const taskService = new TaskService();
